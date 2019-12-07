@@ -1,30 +1,48 @@
 #include <iostream>
-#include <fstream>
-#include <string>
+// #include <fstream>
+#include <string.h>
 #include <unistd.h>
 using namespace std;
 
 #include <stdio.h>
 
+char* _readline(FILE* file_to_read, int* size) {
+    char* res = new char[100];
+    char t = 'a';
+    int i = 0;
+    
+    size = &i;
+    
+    for(i = 0; t != '\n'; i++) {
+        t = fgetc(file_to_read);
+        if(t == EOF) {
+            cout << "AHTUNG" << endl;
+            break;
+        }
+        res[i] = t;
+    }
+    res[++i] = '\n';
+    
+    cout << "[STRING TO READ]" << res << "[SIZE OF STRING]" << *size << endl;
+    return res;
+}
+
 int main(int argc, char* argv[]) {
-    string filename, buffline;
-    ifstream if1;
-    int filedes;
+    FILE* source_file;
+    int filedes, n;
     
     filedes = *argv[1];
-    filename = argv[2];
+    source_file = fopen(argv[2], "r");
     
-    if1.open(filename);
-    
-    while(!if1.eof()) {
-        getline(if1, buffline);
-        write(filedes, buffline.c_str(), buffline.size());
-        // write(filedes, (void*) (EOF), 1);
+    while(!feof(source_file)) {
+        write(filedes, _readline(source_file, &n), n);
+        cout << "[SIZE]" << n << endl;
     }
     
-    write(filedes, "\0", 1);
+    write(filedes, (void*) EOF, sizeof((void*) EOF));
+    cout << "[SIZEOF]" << sizeof((void*) EOF) << endl;
     
     close(filedes);
-    if1.close();
+    fclose(source_file);
     exit(0);
 }
