@@ -1,22 +1,30 @@
 #include <iostream>
+#include <fstream>
+#include <string>
 #include <unistd.h>
 using namespace std;
 
+#include <stdio.h>
+
 int main(int argc, char* argv[]) {
-    cout << "HELLO from " << argv[0] << endl << "Pipe text:" << endl << endl;
-    int filedes[2];
-    char buff;
+    string filename, buffline;
+    ifstream if1;
+    int filedes;
     
-    filedes[0] = *argv[1];
-    filedes[1] = *argv[2];
+    filedes = *argv[1];
+    filename = argv[2];
     
-    close(filedes[1]);
+    if1.open(filename);
     
-    do {
-        read(filedes[0], &buff, 1);
-        printf("%c", buff);
+    while(!if1.eof()) {
+        getline(if1, buffline);
+        write(filedes, buffline.c_str(), buffline.size());
+        // write(filedes, (void*) (EOF), 1);
     }
-    while(buff != EOF);
-    close(filedes[0]);
+    
+    write(filedes, "\0", 1);
+    
+    close(filedes);
+    if1.close();
     exit(0);
 }
