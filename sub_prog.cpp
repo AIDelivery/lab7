@@ -1,48 +1,27 @@
 #include <iostream>
-// #include <fstream>
-#include <string.h>
 #include <unistd.h>
+#include <string>
+#include <fstream>
 using namespace std;
 
-#include <stdio.h>
-
-char* _readline(FILE* file_to_read, int* size) {
-    char* res = new char[100];
-    char t = 'a';
-    int i = 0;
-    
-    size = &i;
-    
-    for(i = 0; t != '\n'; i++) {
-        t = fgetc(file_to_read);
-        if(t == EOF) {
-            cout << "AHTUNG" << endl;
-            break;
-        }
-        res[i] = t;
-    }
-    res[++i] = '\n';
-    
-    cout << "[STRING TO READ]" << res << "[SIZE OF STRING]" << *size << endl;
-    return res;
-}
 
 int main(int argc, char* argv[]) {
-    FILE* source_file;
-    int filedes, n;
+    ifstream source_file;
+    string bufline;
     
-    filedes = *argv[1];
-    source_file = fopen(argv[2], "r");
+    int write_to_pipe_des = *argv[1];
+    source_file.open(argv[2], std::ifstream::in);
     
-    while(!feof(source_file)) {
-        write(filedes, _readline(source_file, &n), n);
-        cout << "[SIZE]" << n << endl;
+    while(!source_file.eof()) {
+        getline(source_file, bufline);
+        bufline.append("\n");
+        size_t sz = bufline.size();
+        
+        write(write_to_pipe_des, bufline.c_str(), sz);
+        // cout << sz << " " << bufline.c_str() << endl;
     }
     
-    write(filedes, (void*) EOF, sizeof((void*) EOF));
-    cout << "[SIZEOF]" << sizeof((void*) EOF) << endl;
-    
-    close(filedes);
-    fclose(source_file);
+    close(write_to_pipe_des);
+    source_file.close();
     exit(0);
 }
