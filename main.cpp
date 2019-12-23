@@ -11,19 +11,18 @@ int main(int argc, char* argv[]) {
     pid_t pid1, pid2;
     int filedes[2];
     char buff;
-    int opened_files = 2;
 
     merge_file = fopen(argv[1], "w");
     pipe(filedes);
 
 
     if((pid1 = fork()) == 0)
-        execl(sub_prog_name, sub_prog_name, &filedes[1], argv[2], NULL);
+        execl(sub_prog_name, sub_prog_name, filedes, argv[2], NULL);
     else if(pid1 < 0)
         return -1;
 
     if((pid2 = fork()) == 0)
-        execl(sub_prog_name, sub_prog_name, &filedes[1], argv[3], NULL);
+        execl(sub_prog_name, sub_prog_name, filedes, argv[3], NULL);
     else if(pid2 < 0)
         return -1;
 

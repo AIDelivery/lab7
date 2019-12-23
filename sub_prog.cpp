@@ -9,22 +9,24 @@ int main(int argc, char* argv[]) {
     ifstream source_file;
     string bufline;
 
-    int write_to_pipe_des = *argv[1];
+    int* pipe_des = (int*) argv[1];
     source_file.open(argv[2], std::ifstream::in);
+    
+    close(pipe_des[0]);
 
     while(!source_file.eof()) {
         getline(source_file, bufline);
         bufline.append("\n");
         size_t sz = bufline.size();
 
-        write(write_to_pipe_des, bufline.c_str(), sz);
+        write(pipe_des[1], bufline.c_str(), sz);
     }
 
     char t = '\0';
-    write(write_to_pipe_des, &t, 1);
+    write(pipe_des[1], &t, 1);
 
     cout << "[Subprogram terminating]" << endl;
-    close(write_to_pipe_des);
+    close(pipe_des[1]);
     source_file.close();
     exit(0);
 }
